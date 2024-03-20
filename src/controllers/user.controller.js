@@ -14,7 +14,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   //check if user already exists : username, email
-  const existedUser = User.findOne({
+  const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
   if (existedUser) throw new ApiError(409, "User already exists");
@@ -23,7 +23,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.files?.avatar[0]?.path;
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
   if (!avatarLocalPath) throw new ApiError(400, "Avatar");
-  
+
   //upload them to cloudinary
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
@@ -40,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   //remove password & refreshtoken field from response
-  const createdUser = await User.findById(user._id).select(
+  const createdUser = await User.findById(newUser._id).select(
     "-password -refreshToken"
   );
 
@@ -53,4 +53,5 @@ const registerUser = asyncHandler(async (req, res) => {
   )
 })
 
-export {registerUser}
+export { registerUser }
+
